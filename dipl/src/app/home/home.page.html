@@ -1,0 +1,26 @@
+<ion-content>
+  <div class="homepage">
+    <div class="dashboard">
+      <ion-text class="page-title lato-bl">DASHBOARD</ion-text>
+
+      <div class="mode-container">
+        <div class="mode-text lato-bo">Mode:</div>
+        <div class="toggle-container">
+          <ion-text class="lato-r toggle-text">MANUAL</ion-text>
+          <ion-toggle class="main-toggle" mode="ios"></ion-toggle>
+          <ion-text class="lato-r toggle-text">AUTOMATIC</ion-text>
+        </div>
+      </div>
+
+      <div class="cards-container">
+        <ion-slides>
+          <ion-slide class="sensor-slide" *ngFor="let p of sensorCards">
+            <app-sensor-slide [sensor]="p">
+            </app-sensor-slide>
+          </ion-slide>
+        </ion-slides>
+
+      </div>
+    </div>
+  </div>
+</ion-content>

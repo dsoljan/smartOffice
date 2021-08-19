@@ -1,0 +1,29 @@
+.sensor-card {
+  min-width: 19rem;
+  padding: var(--component-padding) var(--component-padding) var(--component-padding) 4.5rem;
+  --background: var(--ion-card-background);
+  border: solid 1px var(--ion-card-border);
+  box-shadow: none;
+
+  @media (max-width: 400px) {
+    height: 9.5rem;
+  }
+}
+
+ion-icon {
+  position: relative;
+  z-index: 2;
+  top: 2.7rem;
+  left: 1.1rem;
+  border-radius: var(--text-xs);
+  padding: var(--space-xs) var(--space-xs);
+}
+
+ion-card-content {
+  padding-right: 0px;
+  padding-bottom: 0px;
+}
+
+.subtitle {
+  color: var(--ion-color-medium);
+}

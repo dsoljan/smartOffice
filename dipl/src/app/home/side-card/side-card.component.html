@@ -1,0 +1,16 @@
+<ion-grid>
+  <ion-row>
+    <ion-icon [name]="sensor.icon" size="large">
+    </ion-icon>
+  </ion-row>
+  <ion-row>
+    <ion-card class="sensor-card">
+      <ion-card-subtitle class="lato-bl subtitle">
+        {{ sensor.parameter }}
+      </ion-card-subtitle>
+      <ion-card-title class="lato-bl">
+        {{ sensor.currentValue }}
+      </ion-card-title>
+    </ion-card>
+  </ion-row>
+</ion-grid>
