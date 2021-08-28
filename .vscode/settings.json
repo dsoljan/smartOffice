@@ -1,0 +1,16 @@
+{
+  "js/ts.implicitProjectConfig.checkJs": true,
+  "auto-rename-tag.activationOnLanguage": [
+    "*"
+  ],
+  "eslint.workingDirectories": [
+    "client",
+    "server"
+  ],
+  "bracket-pair-colorizer-2.activeScopeCSS": [
+    "borderStyle : solid",
+    "borderWidth : 1px",
+    "borderColor : {color}",
+    "opacity: 0.5"
+  ]
+}

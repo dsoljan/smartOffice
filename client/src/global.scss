@@ -43,3 +43,10 @@
 .lato-bl {
   font-weight: 900;
 }
+
+ion-button {
+  --color: var(--ion-color-dark);
+  --color-activated: var(--ion-color-dark);
+  --color-focused: var(--ion-color-dark);
+  --color-hover: var(--ion-color-dark);
+}

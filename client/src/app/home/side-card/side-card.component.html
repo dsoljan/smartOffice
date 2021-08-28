@@ -1,0 +1,28 @@
+<ion-grid class="card-grid">
+  <ion-row class="icon-row">
+    <img class="card-icon" src={{parameter.path}} />
+    <ion-toggle
+      *ngIf="parameter.name === 'LIGHTS'"
+      checked="lightsBtn"
+      [(ngModel)]="this.lightsBtn"
+      (ionChange)="changeLightsToggle()"
+      class="card-toggle"
+      mode="ios">
+    </ion-toggle>
+    <ion-toggle
+      *ngIf="parameter.name !== 'LIGHTS'"
+      class="card-toggle"
+      mode="ios">
+    </ion-toggle>
+  </ion-row>
+  <ion-row class="card-row">
+    <ion-card class="sensor-card">
+      <ion-card-title class="lato-bl title">
+        {{ parameter.name }}
+      </ion-card-title>
+      <ion-card-subtitle class="lato-bo subtitle">
+        {{ parameter.currentValue }}
+      </ion-card-subtitle>
+    </ion-card>
+  </ion-row>
+</ion-grid>

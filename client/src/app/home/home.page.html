@@ -1,0 +1,74 @@
+<ion-content>
+  <div class="homepage">
+    <div class="dashboard">
+      <ion-text class="page-title lato-bl">DASHBOARD</ion-text>
+
+      <div class="mode-container">
+        <div class="mode-text lato-bo">Mode:</div>
+        <div class="toggle-container">
+          <ion-text class="lato-r toggle-text">MANUAL</ion-text>
+          <ion-toggle class="main-toggle" mode="ios"></ion-toggle>
+          <ion-text class="lato-r toggle-text">AUTOMATIC</ion-text>
+        </div>
+      </div>
+
+      <div class="cards-container">
+
+        <ion-slides class="card-slides" [options]="slideOptions">
+          <ion-slide class="card-slide" *ngFor="let p of parameterCards">
+            <app-side-card
+              [parameter]="p"
+              [lightsBtn]="lightsToggle"
+              (toggleEvent)="changeToggleFromChild($event)"
+              class="card-component">
+            </app-side-card>
+          </ion-slide>
+        </ion-slides>
+
+        <div class="active-card">
+          <ion-grid class="active-card-grid">
+            <ion-row class="active-icon-row">
+              <img class="active-card-icon" src="assets/custom/lights-icon.svg" />
+              <ion-toggle
+                checked="lightsToggle"
+                class="active-card-toggle"
+                [(ngModel)]="this.lightsToggle"
+                mode="ios">
+                <!-- (ionChange)="changeLightsToggle()" -->
+              </ion-toggle>
+            </ion-row>
+            <ion-row class="active-card-title">
+              <ion-text class="active-card-title lato-bl">LIGHTS</ion-text>
+            </ion-row>
+            <ion-row class="active-card-title">
+              <ion-button
+                (click)="onClickOff()"
+                (click)="lightChange(1, 'on', false)"
+                [style.--background]="btnClickOff ? 'var(--ion-color-warning)' : 'var(--ion-color-light)'"
+                class="lato-bo main-btn">
+                OFF
+              </ion-button>
+              <ion-button
+                (click)="onClickOn()"
+                (click)="lightChange(1, 'on', true)"
+                [style.--background]="btnClickOn ? 'var(--ion-color-warning)' : 'var(--ion-color-light)'"
+                class="lato-bo main-btn">
+                ON
+              </ion-button>
+            </ion-row>
+          </ion-grid>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lights">
+    <ul *ngFor="let light of lights; let i = index">
+      <li class="light-box">
+        <p> {{ light | json }} </p>
+      </li>
+    </ul>
+  </div>
+</ion-content>
+<!--                 (click)="lightChange(1, 'bri', 0)"
+ -->
