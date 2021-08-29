@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { OnInit } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -8,14 +10,15 @@ import { OnInit } from '@angular/core';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements OnInit {
-  btnClickOff = true;
-  btnClickOn = false;
-  lights: string[];
+  lights: any;
   lightChangeValues = {};
 
-  lightsToggle = false;
+  rangeValue: number;
+  lightsValue: string;
+  lightsSubject = new Subject<string>();
 
-  lightsValue = 'off';
+  lightsToggle = false;
+  mainToggle = false;
 
   slideOptions = {
     slidesPerView: 'auto',
@@ -25,12 +28,7 @@ export class HomePage implements OnInit {
     pagination: false
   };
 
-  parameterCards = [
-    {
-      name: 'LIGHTS',
-      currentValue: this.lightsValue,
-      path: 'assets/custom/lights-icon.svg'
-    },
+  parameter = [
     {
       name: 'WINDOWS',
       currentValue: 'open',
@@ -51,41 +49,51 @@ export class HomePage implements OnInit {
   private username = 'JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW';
   private hueApiUrl = `http://192.168.0.34/api/${this.username}/lights`;
 
-  constructor(private http: HttpClient) { }
+
+  constructor(private http: HttpClient) {
+  }
+
+  onMainToggle() {
+    this.lightsToggle = !this.lightsToggle;
+  }
 
   onClickOff() {
-    if (!this.btnClickOff) {
-      this.btnClickOff = true;
+    if (this.lightsValue === 'on') {
+      this.lightChange('on', false);
       this.lightsValue = 'off';
-    }
-    if (this.btnClickOff) {
-      this.btnClickOn = false;
+      this.rangeValue = 0;
     }
   }
 
   onClickOn() {
-    if (!this.btnClickOn) {
-      this.btnClickOn = true;
+    if (this.lightsValue === 'off') {
+      this.lightsValue = 'on';
+      this.lightChange('on', true);
+      this.rangeValue = 254;
+    }
+    console.log(this.lightsValue, this.rangeValue);
+  }
+
+  logChange(ev: any) {
+    this.rangeValue = ev.detail.value;
+
+    if (this.rangeValue > 0) {
+      this.lightChange('on', true);
+      this.lightChange('bri', this.rangeValue);
       this.lightsValue = 'on';
     }
-    if (this.btnClickOn) {
-      this.btnClickOff = false;
+    else {
+      this.lightChange('on', false);
+      this.lightsValue = 'off';
     }
-  }
-
-  // changeLightsToggle() {
-  //   console.log(this.lightsToggle);
-  // }
-
-  changeToggleFromChild($event) {
-    this.lightsToggle = $event;
+    console.log(this.lightsValue, this.rangeValue);
   }
 
 
-  lightChange(lightNumber, property, propertyValue) {
+  lightChange(property, propertyValue) {
     this.lightChangeValues[property] = propertyValue;
     this.http.put(
-      `${this.hueApiUrl}/${lightNumber}/state`, this.lightChangeValues
+      `${this.hueApiUrl}/1/state`, this.lightChangeValues
     )
       .subscribe(
         data => { console.log(data); },
@@ -95,16 +103,29 @@ export class HomePage implements OnInit {
       );
   }
 
+
+
   ngOnInit(): void {
-    this.http.get(this.hueApiUrl)
+    this.http.get(`${this.hueApiUrl}/1`)
       .subscribe(
         data => {
-          this.lights = Object.values(data);
+          this.lights = Object.values(data)[0];
+          // this.rangeValue = this.lights.bri;
+          if (this.lights.on) {
+            this.lightsValue = 'on';
+          }
+          else {
+            this.lightsValue = 'off';
+            this.rangeValue = 0;
+          }
+          console.log(this.lightsValue, this.rangeValue);
         },
         err => {
           console.log(err);
         }
       );
+
   }
 
 }
+

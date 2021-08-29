@@ -7,28 +7,66 @@
         <div class="mode-text lato-bo">Mode:</div>
         <div class="toggle-container">
           <ion-text class="lato-r toggle-text">MANUAL</ion-text>
-          <ion-toggle class="main-toggle" mode="ios"></ion-toggle>
+          <ion-toggle
+            class="main-toggle"
+            mode="ios"
+            (ionChange)="onMainToggle()"
+            [(ngModel)]="this.mainToggle">
+          </ion-toggle>
           <ion-text class="lato-r toggle-text">AUTOMATIC</ion-text>
         </div>
       </div>
 
       <div class="cards-container">
-
         <ion-slides class="card-slides" [options]="slideOptions">
-          <ion-slide class="card-slide" *ngFor="let p of parameterCards">
+          <!-- LIGHTS SIDE CARD -->
+          <ion-slide class="card-slide" [class.disabledBackground]="lightsToggle">
+            <ion-grid class="card-grid">
+              <ion-row class="icon-row">
+                <img class="card-icon" src="assets/custom/lights-icon.svg" />
+                <ion-toggle
+                  checked="lightsToggle"
+                  class="card-toggle"
+                  [(ngModel)]="this.lightsToggle"
+                  mode="ios">
+                </ion-toggle>
+              </ion-row>
+              <ion-row class="card-row" [class.disabled]="lightsToggle">
+                <ion-card class="sensor-card-lights">
+                  <ion-card-title class="lato-bl title">
+                    LIGHTS
+                  </ion-card-title>
+                  <ion-card-subtitle class="lato-bo subtitle">
+                    {{ this.lightsValue }}
+                  </ion-card-subtitle>
+                </ion-card>
+              </ion-row>
+            </ion-grid>
+          </ion-slide>
+
+          <ion-slide class="card-slide" *ngFor="let p of parameter">
             <app-side-card
               [parameter]="p"
               [lightsBtn]="lightsToggle"
-              (toggleEvent)="changeToggleFromChild($event)"
               class="card-component">
             </app-side-card>
+            <!-- (toggleEvent)="changeToggleFromChild($event)" -->
           </ion-slide>
         </ion-slides>
 
-        <div class="active-card">
+        <!-- LIGHTS ACTIVE CARD -->
+        <div class="active-card" [class.disabledBackground]="lightsToggle">
           <ion-grid class="active-card-grid">
+
             <ion-row class="active-icon-row">
               <img class="active-card-icon" src="assets/custom/lights-icon.svg" />
+            </ion-row>
+            <ion-row class="active-card-title">
+              <ion-text
+                class="active-card-title lato-bl"
+                [class.disabled]="lightsToggle">
+                LIGHTS
+              </ion-text>
               <ion-toggle
                 checked="lightsToggle"
                 class="active-card-toggle"
@@ -37,38 +75,46 @@
                 <!-- (ionChange)="changeLightsToggle()" -->
               </ion-toggle>
             </ion-row>
-            <ion-row class="active-card-title">
-              <ion-text class="active-card-title lato-bl">LIGHTS</ion-text>
-            </ion-row>
-            <ion-row class="active-card-title">
+
+            <ion-row class="active-card-btn">
               <ion-button
                 (click)="onClickOff()"
-                (click)="lightChange(1, 'on', false)"
-                [style.--background]="btnClickOff ? 'var(--ion-color-warning)' : 'var(--ion-color-light)'"
-                class="lato-bo main-btn">
+                [style.--background]="this.lightsValue === 'off' ? 'var(--ion-color-warning)' : 'var(--ion-color-light)'"
+                class="lato-bo main-btn"
+                [disabled]="lightsToggle">
                 OFF
               </ion-button>
               <ion-button
                 (click)="onClickOn()"
-                (click)="lightChange(1, 'on', true)"
-                [style.--background]="btnClickOn ? 'var(--ion-color-warning)' : 'var(--ion-color-light)'"
-                class="lato-bo main-btn">
+                [style.--background]="this.lightsValue === 'on' ? 'var(--ion-color-warning)' : 'var(--ion-color-light)'"
+                class="lato-bo main-btn"
+                [disabled]="lightsToggle">
                 ON
               </ion-button>
             </ion-row>
+
+            <ion-row class="light-1">
+              <img
+                [class.disabled]="lightsToggle"
+                src="../../assets/custom/light-1.svg"
+                class="light-icon" />
+              <ion-range
+                min="0"
+                max="254"
+                step="1"
+                mode="ios"
+                debounce="1000"
+                pin="true"
+                class="lights-slider"
+                [disabled]="lightsToggle"
+                [(ngModel)]="this.rangeValue"
+                (ionChange)="logChange($event)">
+              </ion-range>
+            </ion-row>
+
           </ion-grid>
         </div>
       </div>
     </div>
   </div>
-
-  <div class="lights">
-    <ul *ngFor="let light of lights; let i = index">
-      <li class="light-box">
-        <p> {{ light | json }} </p>
-      </li>
-    </ul>
-  </div>
 </ion-content>
-<!--                 (click)="lightChange(1, 'bri', 0)"
- -->

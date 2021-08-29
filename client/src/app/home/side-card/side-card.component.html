@@ -2,15 +2,6 @@
   <ion-row class="icon-row">
     <img class="card-icon" src={{parameter.path}} />
     <ion-toggle
-      *ngIf="parameter.name === 'LIGHTS'"
-      checked="lightsBtn"
-      [(ngModel)]="this.lightsBtn"
-      (ionChange)="changeLightsToggle()"
-      class="card-toggle"
-      mode="ios">
-    </ion-toggle>
-    <ion-toggle
-      *ngIf="parameter.name !== 'LIGHTS'"
       class="card-toggle"
       mode="ios">
     </ion-toggle>

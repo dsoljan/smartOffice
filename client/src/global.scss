@@ -50,3 +50,8 @@ ion-button {
   --color-focused: var(--ion-color-dark);
   --color-hover: var(--ion-color-dark);
 }
+
+ion-toggle {
+  --handle-background: no-repeat center/80% url("data:image/svg+xml,%3Csvg viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg' %3E%3Cstyle%3E .small %7B font: 30px sans-serif; fill: black%7D %7D %3C/style%3E%3Ctext x='50%25' y='50%25' alignment-baseline='central' text-anchor='middle' class='small'%3EM%3C/text%3E%3C/svg%3E");
+  --handle-background-checked: no-repeat center/80% url("data:image/svg+xml,%3Csvg viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cstyle%3E .small %7B font: 30px sans-serif; fill: white;%7D %7D %3C/style%3E%3Ctext x='50%25' y='50%25' alignment-baseline='central' text-anchor='middle' class='small'%3EA%3C/text%3E%3C/svg%3E");
+}
