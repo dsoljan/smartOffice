@@ -8,7 +8,7 @@
         <div class="toggle-container">
           <ion-text class="lato-r toggle-text">MANUAL</ion-text>
           <ion-toggle
-            class="main-toggle"
+            class="main-toggle manual-auto"
             mode="ios"
             (ionChange)="onMainToggle()"
             [(ngModel)]="this.mainToggle">
@@ -17,103 +17,296 @@
         </div>
       </div>
 
+      <!-- SIDE CARDS -->
       <div class="cards-container">
-        <ion-slides class="card-slides" [options]="slideOptions">
-          <!-- LIGHTS SIDE CARD -->
-          <ion-slide class="card-slide" [class.disabledBackground]="lightsToggle">
-            <ion-grid class="card-grid">
-              <ion-row class="icon-row">
-                <img class="card-icon" src="assets/custom/lights-icon.svg" />
+        <ion-slides
+          #cards
+          class="card-slides"
+          [options]="slideOptions"
+          (ionSlideTap)="changeActiveCard()">
+          <ion-slide
+            class="card-slide"
+            *ngFor="let p of parameter"
+            [class.disabledBackground]="this.parameterToggle[p.id]">
+            <app-side-card
+              [parameter]="p"
+              [toggles]="parameterToggle"
+              [values]="parameterValues"
+              class="card-component">
+            </app-side-card>
+          </ion-slide>
+        </ion-slides>
+
+
+        <ion-slides
+          #activeCard
+          class="active-slides"
+          [options]="slideOptions2">
+          <!-- LIGHTS ACTIVE CARD -->
+          <ion-slide
+            class="active-card"
+            [class.disabledBackground]="this.parameterToggle[0]">
+            <ion-grid class="active-card-grid">
+
+              <ion-row class="active-icon-row">
+                <img class="active-card-icon" [src]="this.parameter[0].path" />
+              </ion-row>
+              <ion-row class="active-card-title">
+                <ion-text
+                  class="active-card-title lato-bl"
+                  [class.disabled]="this.parameterToggle[0]">
+                  {{this.parameter[0].name}}
+                </ion-text>
                 <ion-toggle
-                  checked="lightsToggle"
-                  class="card-toggle"
-                  [(ngModel)]="this.lightsToggle"
+                  class="active-card-toggle manual-auto"
+                  [(ngModel)]="this.parameterToggle[0]"
                   mode="ios">
+                  <!-- (ionChange)="changeLightsToggle()" -->
                 </ion-toggle>
               </ion-row>
-              <ion-row class="card-row" [class.disabled]="lightsToggle">
-                <ion-card class="sensor-card-lights">
-                  <ion-card-title class="lato-bl title">
-                    LIGHTS
-                  </ion-card-title>
-                  <ion-card-subtitle class="lato-bo subtitle">
-                    {{ this.lightsValue }}
-                  </ion-card-subtitle>
-                </ion-card>
+
+              <ion-row class="active-card-btn">
+                <ion-button
+                  (click)="onClickOff()"
+                  [style.--background]="this.parameterValues[0] === 'off' ?
+                  'var(--ion-color-warning)' : 'var(--ion-color-light)'"
+                  class="lato-bo main-btn"
+                  [disabled]="this.parameterToggle[0]">
+                  OFF
+                </ion-button>
+                <ion-button
+                  (click)="onClickOn()"
+                  [style.--background]="this.parameterValues[0] === 'on' ?
+                  'var(--ion-color-warning)' : 'var(--ion-color-light)'"
+                  class="lato-bo main-btn"
+                  [disabled]="this.parameterToggle[0]">
+                  ON
+                </ion-button>
+              </ion-row>
+
+              <ion-row class="light-1">
+                <img
+                  [class.disabled]="this.parameterToggle[0]"
+                  src="../../assets/custom/light-1.svg"
+                  class="main-card-icon" />
+                <ion-range
+                  min="0"
+                  max="254"
+                  step="1"
+                  mode="ios"
+                  debounce="1000"
+                  pin="true"
+                  class="lights-slider"
+                  [disabled]="this.parameterToggle[0]"
+                  [(ngModel)]="this.lightsRangeVal"
+                  (ionChange)="sliderLightsChange($event)">
+                </ion-range>
               </ion-row>
             </ion-grid>
           </ion-slide>
 
-          <ion-slide class="card-slide" *ngFor="let p of parameter">
-            <app-side-card
-              [parameter]="p"
-              [lightsBtn]="lightsToggle"
-              class="card-component">
-            </app-side-card>
-            <!-- (toggleEvent)="changeToggleFromChild($event)" -->
+          <!-- WINDOWS ACTIVE CARD -->
+          <ion-slide
+            class="active-card"
+            [class.disabledBackground]="this.parameterToggle[1]">
+            <ion-grid class="active-card-grid">
+
+              <ion-row class="active-icon-row">
+                <img class="active-card-icon" [src]="this.parameter[1].path" />
+              </ion-row>
+              <ion-row class="active-card-title">
+                <ion-text
+                  class="active-card-title lato-bl"
+                  [class.disabled]="this.parameterToggle[1]">
+                  {{this.parameter[1].name}}
+                </ion-text>
+                <ion-toggle
+                  class="active-card-toggle manual-auto"
+                  [(ngModel)]="this.parameterToggle[1]"
+                  mode="ios">
+                  <!-- (ionChange)="changeLightsToggle()" -->
+                </ion-toggle>
+              </ion-row>
+
+              <ion-row class="active-card-btn">
+                <ion-button
+                  (click)="onClickClose()"
+                  [style.--background]="this.parameterValues[1] === 'closed' ?
+                  'var(--ion-color-tertiary)' : 'var(--ion-color-light)'"
+                  class="lato-bo main-btn"
+                  [disabled]="this.parameterToggle[1]">
+                  CLOSE
+                </ion-button>
+                <ion-button
+                  (click)="onClickOpen()"
+                  [style.--background]="this.parameterValues[1] === 'open' ?
+                  'var(--ion-color-tertiary)' : 'var(--ion-color-light)'"
+                  class="lato-bo main-btn"
+                  [disabled]="this.parameterToggle[1]">
+                  OPEN
+                </ion-button>
+              </ion-row>
+
+              <ion-row class="window-1">
+                <img
+                  [class.disabled]="this.parameterToggle[1]"
+                  src="../../assets/custom/window-1.svg"
+                  class="window-icon" />
+                <ion-text
+                  class="lato-bo title"
+                  [class.disabled]="this.parameterToggle[1]">
+                  CLOSE
+                </ion-text>
+                <ion-toggle
+                  class="window-toggle"
+                  mode="ios"
+                  (ionChange)="checkWindows()"
+                  [disabled]="this.parameterToggle[1]"
+                  [(ngModel)]="this.window1"></ion-toggle>
+                <ion-text
+                  class="lato-bo title"
+                  [class.disabled]="this.parameterToggle[1]">
+                  OPEN
+                </ion-text>
+              </ion-row>
+              <ion-row class="window-2">
+                <img
+                  [class.disabled]="this.parameterToggle[1]"
+                  src="../../assets/custom/window-2.svg"
+                  class="window-icon" />
+                <ion-text
+                  class="lato-bo title"
+                  [class.disabled]="this.parameterToggle[1]">
+                  CLOSE
+                </ion-text>
+                <ion-toggle
+                  class="window-toggle"
+                  mode="ios"
+                  (ionChange)="checkWindows()"
+                  [disabled]="this.parameterToggle[1]"
+                  [(ngModel)]="this.window2">
+                </ion-toggle>
+                <ion-text
+                  class="lato-bo title"
+                  [class.disabled]="this.parameterToggle[1]">
+                  OPEN
+                </ion-text>
+              </ion-row>
+
+            </ion-grid>
           </ion-slide>
+
+          <!-- BLINDS ACTIVE CARD -->
+          <ion-slide
+            class="active-card"
+            [class.disabledBackground]="this.parameterToggle[2]">
+            <ion-grid class="active-card-grid">
+
+              <ion-row class="active-icon-row">
+                <img class="active-card-icon" [src]="this.parameter[2].path" />
+              </ion-row>
+              <ion-row class="active-card-title">
+                <ion-text
+                  class="active-card-title lato-bl"
+                  [class.disabled]="this.parameterToggle[2]">
+                  {{this.parameter[2].name}}
+                </ion-text>
+                <ion-toggle
+                  class="active-card-toggle manual-auto"
+                  [(ngModel)]="this.parameterToggle[2]"
+                  mode="ios">
+                  <!-- (ionChange)="changeLightsToggle()" -->
+                </ion-toggle>
+              </ion-row>
+
+              <ion-row class="active-card-btn">
+                <ion-button
+                  (click)="onClickUp()"
+                  [style.--background]="this.parameterValues[2] === 'up' ?
+                  'var(--ion-color-success)' : 'var(--ion-color-light)'"
+                  class="lato-bo main-btn"
+                  [disabled]="this.parameterToggle[2]">
+                  UP
+                </ion-button>
+                <ion-button
+                  (click)="onClickDown()"
+                  [style.--background]="this.parameterValues[2] === 'down' ?
+                  'var(--ion-color-success)' : 'var(--ion-color-light)'"
+                  class="lato-bo main-btn"
+                  [disabled]="this.parameterToggle[2]">
+                  DOWN
+                </ion-button>
+              </ion-row>
+
+              <ion-row class="blinds-1">
+                <img
+                  [class.disabled]="this.parameterToggle[2]"
+                  src="../../assets/custom/blind-1.svg"
+                  class="main-card-icon" />
+                <ion-range
+                  min="0"
+                  max="100"
+                  step="25"
+                  snaps="true"
+                  mode="ios"
+                  class="lights-slider"
+                  [disabled]="this.parameterToggle[2]"
+                  [(ngModel)]="this.blindsRangeVal"
+                  (ionChange)="sliderBlindsChange($event)">
+                </ion-range>
+              </ion-row>
+
+              <ion-row class="blinds-1">
+                <ion-text>ANGLE:</ion-text>
+                <ion-range
+                  min="0"
+                  max="100"
+                  step="25"
+                  snaps="true"
+                  mode="ios"
+                  class="lights-slider"
+                  [disabled]="this.parameterToggle[2]"
+                  [(ngModel)]="this.blindsRangeAngle"
+                  (ionChange)="sliderBlindsChange($event)">
+                </ion-range>
+              </ion-row>
+
+              <ion-row class="blinds-1">
+                <img
+                  [class.disabled]="this.parameterToggle[2]"
+                  src="../../assets/custom/blind-2.svg"
+                  class="main-card-icon" />
+                <ion-range
+                  min="0"
+                  max="100"
+                  step="25"
+                  snaps="true"
+                  mode="ios"
+                  class="lights-slider"
+                  [disabled]="this.parameterToggle[2]"
+                  [(ngModel)]="this.blindsRangeVal2"
+                  (ionChange)="sliderBlindsChange($event)">
+                </ion-range>
+              </ion-row>
+
+              <ion-row class="blinds-1">
+                <ion-text>ANGLE:</ion-text>
+                <ion-range
+                  min="0"
+                  max="100"
+                  step="25"
+                  snaps="true"
+                  mode="ios"
+                  class="lights-slider"
+                  [disabled]="this.parameterToggle[2]"
+                  [(ngModel)]="this.blindsRangeAngle2"
+                  (ionChange)="sliderBlindsChange($event)">
+                </ion-range>
+              </ion-row>
+            </ion-grid>
+          </ion-slide>
+
         </ion-slides>
-
-        <!-- LIGHTS ACTIVE CARD -->
-        <div class="active-card" [class.disabledBackground]="lightsToggle">
-          <ion-grid class="active-card-grid">
-
-            <ion-row class="active-icon-row">
-              <img class="active-card-icon" src="assets/custom/lights-icon.svg" />
-            </ion-row>
-            <ion-row class="active-card-title">
-              <ion-text
-                class="active-card-title lato-bl"
-                [class.disabled]="lightsToggle">
-                LIGHTS
-              </ion-text>
-              <ion-toggle
-                checked="lightsToggle"
-                class="active-card-toggle"
-                [(ngModel)]="this.lightsToggle"
-                mode="ios">
-                <!-- (ionChange)="changeLightsToggle()" -->
-              </ion-toggle>
-            </ion-row>
-
-            <ion-row class="active-card-btn">
-              <ion-button
-                (click)="onClickOff()"
-                [style.--background]="this.lightsValue === 'off' ? 'var(--ion-color-warning)' : 'var(--ion-color-light)'"
-                class="lato-bo main-btn"
-                [disabled]="lightsToggle">
-                OFF
-              </ion-button>
-              <ion-button
-                (click)="onClickOn()"
-                [style.--background]="this.lightsValue === 'on' ? 'var(--ion-color-warning)' : 'var(--ion-color-light)'"
-                class="lato-bo main-btn"
-                [disabled]="lightsToggle">
-                ON
-              </ion-button>
-            </ion-row>
-
-            <ion-row class="light-1">
-              <img
-                [class.disabled]="lightsToggle"
-                src="../../assets/custom/light-1.svg"
-                class="light-icon" />
-              <ion-range
-                min="0"
-                max="254"
-                step="1"
-                mode="ios"
-                debounce="1000"
-                pin="true"
-                class="lights-slider"
-                [disabled]="lightsToggle"
-                [(ngModel)]="this.rangeValue"
-                (ionChange)="logChange($event)">
-              </ion-range>
-            </ion-row>
-
-          </ion-grid>
-        </div>
       </div>
     </div>
   </div>

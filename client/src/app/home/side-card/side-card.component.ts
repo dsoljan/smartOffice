@@ -7,20 +7,11 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 })
 export class SideCardComponent implements OnInit {
   @Input() parameter: any;
-  @Input() lightsBtn: boolean;
-  @Output() toggleEvent = new EventEmitter<boolean>();
+  @Input() toggles: Array<boolean>;
+  @Input() values: Array<string>;
 
-  lightsToggle: boolean;
-
-
-  constructor() {
-    this.lightsToggle = false;
-  }
+  constructor() { }
 
   ngOnInit() { }
-
-  changeLightsToggle() {
-    this.toggleEvent.emit(this.lightsBtn);
-  }
 
 }
