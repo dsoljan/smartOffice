@@ -15,14 +15,19 @@ export class HomePage implements OnInit {
   lights: any;
   lightChangeValues = {};
   lightsRangeVal: number;
+  hueLightsRangeVal: number;
 
   window1 = false;
   window2 = false;
 
-  blindsRangeVal: number;
-  blindsRangeAngle: number;
-  blindsRangeVal2: number;
-  blindsRangeAngle2: number;
+  blindsRangeVal = 0;
+  blindsRangeAngle = 0;
+  blindsRangeVal2 = 0;
+  blindsRangeAngle2 = 0;
+
+  acSliderVal = 16;
+  fanOff = false;
+  fanReduce = false;
 
   parameterValues = ['off', 'closed', 'up', '23°C'];
 
@@ -71,7 +76,7 @@ export class HomePage implements OnInit {
   ];
 
   private username = 'JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW';
-  private hueApiUrl = `http://192.168.0.34/api/${this.username}/lights`;
+  private hueApiUrl = `http://192.168.0.24/api/${this.username}/lights`;
 
   constructor(private http: HttpClient) { }
 
@@ -94,6 +99,7 @@ export class HomePage implements OnInit {
       this.lightChange('on', false);
       this.parameterValues[0] = 'off';
       this.lightsRangeVal = 0;
+      this.hueLightsRangeVal = 0;
     }
   }
 
@@ -101,7 +107,7 @@ export class HomePage implements OnInit {
     if (this.parameterValues[0] === 'off') {
       this.parameterValues[0] = 'on';
       this.lightChange('on', true);
-      this.lightsRangeVal = 254;
+      this.lightsRangeVal = 100;
     }
     console.log(this.parameterValues[0], this.lightsRangeVal);
   }
@@ -122,26 +128,59 @@ export class HomePage implements OnInit {
   // BLINDS UP/DOWN BUTTONS
   onClickUp() {
     this.parameterValues[2] = 'up';
+    this.blindsRangeVal = 0;
+    this.blindsRangeAngle = 0;
+    this.blindsRangeVal2 = 0;
+    this.blindsRangeAngle2 = 0;
   }
 
   onClickDown() {
     this.parameterValues[2] = 'down';
+    this.blindsRangeVal = 100;
+    this.blindsRangeAngle = 100;
+    this.blindsRangeVal2 = 100;
+    this.blindsRangeAngle2 = 100;
+  }
+
+  // AC OFF/ON BUTTON
+  onClickACOff() {
+    this.parameterValues[3] = 'off';
+  }
+
+  onClickACOn() {
+    this.parameterValues[3] = 'on';
+  }
+
+  // AC REDUCE/SWITCH OFF
+  onClickReduce() {
+    if (this.fanOff) {
+      this.fanOff = false;
+    }
+    this.fanReduce = !this.fanReduce;
+  }
+
+  onClickSwitchOff() {
+    if (this.fanReduce) {
+      this.fanReduce = false;
+    }
+    this.fanOff = !this.fanOff;
   }
 
   // LIGHTS SLIDER
   sliderLightsChange(ev: any) {
-    this.lightsRangeVal = ev.detail.value;
+    // this.lightsRangeVal = ev.detail.value;
+    this.hueLightsRangeVal = Math.floor(this.lightsRangeVal * 2.54);
 
     if (this.lightsRangeVal > 0) {
       this.lightChange('on', true);
-      this.lightChange('bri', this.lightsRangeVal);
+      this.lightChange('bri', this.hueLightsRangeVal);
       this.parameterValues[0] = 'on';
     }
     else {
       this.lightChange('on', false);
       this.parameterValues[0] = 'off';
     }
-    console.log(this.parameterValues[0], this.lightsRangeVal);
+    console.log(this.parameterValues[0], this.lightsRangeVal, this.hueLightsRangeVal);
   }
 
   // WINDOWS TOGGLES
@@ -158,19 +197,21 @@ export class HomePage implements OnInit {
   }
 
   // BLINDS SLIDER
-  sliderBlindsChange(ev: any) {
-    console.log(ev);
-    this.blindsRangeVal = ev.detail.value;
-
-    if (this.blindsRangeVal > 0) {
+  sliderBlindsChange() {
+    console.log(this.blindsRangeAngle, this.blindsRangeAngle2);
+    if (this.blindsRangeVal === 100 && this.blindsRangeVal2 === 100) {
       this.parameterValues[2] = 'down';
     }
-    else {
+    if (this.blindsRangeVal === 0 && this.blindsRangeVal === 0) {
       this.parameterValues[2] = 'up';
     }
     console.log(this.parameterValues[2], this.blindsRangeVal);
   }
 
+  // TEMPERATURE SLIDER
+  logs() {
+    console.log(this.acSliderVal);
+  }
 
   // CHANGE LIGHT OFF/ON/BRI
   lightChange(property, propertyValue) {
@@ -192,13 +233,15 @@ export class HomePage implements OnInit {
       .subscribe(
         data => {
           this.lights = Object.values(data)[0];
-          this.lightsRangeVal = this.lights.bri;
+          this.hueLightsRangeVal = this.lights.bri;
+          this.lightsRangeVal = Math.floor(this.hueLightsRangeVal / 2.54);
           if (this.lights.on) {
             this.parameterValues[0] = 'on';
           }
           else {
             this.parameterValues[0] = 'off';
             this.lightsRangeVal = 0;
+            this.hueLightsRangeVal = 0;
           }
           console.log(this.parameterValues[0], this.lightsRangeVal);
         },

@@ -13,7 +13,6 @@
     height: 100vh;
     width: 100vw;
   }
- 
 }
 
 .dashboard {
@@ -47,7 +46,7 @@
   font-size: 1.3rem;
   letter-spacing: 1px;
   padding-left: 1rem;
-  padding-top: 3vh;
+  padding-top: 4vh;
 
   @media (min-width: 768px) {
     padding-top: 0;
@@ -93,14 +92,11 @@
 
 .card-slides {
   width: 100%;
-  // overflow-x: scroll;
   display: block;
-
 }
 
 .card-slide {
   width: 10.5rem;
-  // margin: 1rem 1rem 2rem 1rem;
 }
 
 .card-component {
@@ -126,11 +122,19 @@
 }
 
 .active-card-title {
-  font-size: 2rem;
+  font-size: 1.8rem;
   letter-spacing: 2px;
+  text-align: left;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+
+  @media (min-width: 410px)  {
+    font-size: 1.8rem;
+  }
+  @media (min-width: 360px) and (max-width: 409px)  {
+    font-size: 1.5rem;
+  }
 }
 
 .active-card-grid {
@@ -178,7 +182,7 @@
   }
 }
 
-.disabledBackground {
+.disabled {
   background-color: rgba(var(--ion-color-medium-rgb), 0.1);
 }
 
@@ -186,17 +190,9 @@
   opacity: 0.7;
 }
 
-.lights-slider {
-  --bar-background: var(--ion-color-medium);
-  --bar-background-active: #313133;
-  --bar-height: 0.5rem;
-  --knob-background: #313133;
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
-
-ion-range::part(tick) {
-  color: var(--ion-color-dark);
+.brightness-row {
+  padding-top: 1.5rem;
+  padding-left: 3rem;
 }
 
 .main-card-icon {
@@ -206,9 +202,17 @@ ion-range::part(tick) {
 .light-1 {
   display: flex;
   align-items: center;
-  padding-top: 1.5rem;
+  padding-top: 1rem;
 }
 
+.slider-text {
+  padding-left: 3.5rem;
+  padding-right: 0.3rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: -0.2rem;
+}
 
 .window-1 {
   display: flex;
@@ -237,6 +241,67 @@ ion-range::part(tick) {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding-top: 1.7rem;
+}
+
+.blinds-angle {
+  display: flex;
+  align-items: center;
+}
+
+.angle {
+  font-size: 1rem;
+}
+
+.caption {
+  font-size: 0.9rem;
+}
+
+
+.ac {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 50vh;
   padding-top: 1.5rem;
 }
 
+.ac-col {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.ac-col2 {
+  height: 80%;
+  width: 100%;
+}
+
+.ac-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.ac-btn {
+  --border-color: var(--ion-color-dark);
+  --border-style: solid;
+  --border-width: 1px;
+}
+
+.number-input {
+  font-size: 1.7rem;
+  height: 1.9rem;
+  padding-left: 1rem;
+}
+
+.ac-slider {
+  max-width: 250px;
+  position: relative;
+  bottom: 7rem;
+}
