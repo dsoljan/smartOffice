@@ -6,14 +6,14 @@
       <div class="mode-container">
         <div class="mode-text lato-bo">Mode:</div>
         <div class="toggle-container">
-          <ion-text class="lato-r caption toggle-text">MANUAL</ion-text>
+          <ion-text class="lato-r angle toggle-text">MANUAL</ion-text>
           <ion-toggle
             class="main-toggle manual-auto"
             mode="ios"
             (ionChange)="onMainToggle()"
             [(ngModel)]="this.mainToggle">
           </ion-toggle>
-          <ion-text class="lato-r caption toggle-text">AUTOMATIC</ion-text>
+          <ion-text class="lato-r angle toggle-text">AUTOMATIC</ion-text>
         </div>
       </div>
 
@@ -107,8 +107,8 @@
                 </ion-range>
               </ion-row>
               <ion-row class="slider-text">
-                <div class="lato-r caption">0</div>
-                <div class="lato-r caption">100%</div>
+                <div class="lato-r angle">0</div>
+                <div class="lato-r angle">100%</div>
               </ion-row>
             </ion-grid>
           </ion-slide>
@@ -256,7 +256,6 @@
                   max="100"
                   step="25"
                   snaps="true"
-                  pin="true"
                   mode="md"
                   [disabled]="this.parameterToggle[2]"
                   [(ngModel)]="this.blindsRangeVal"
@@ -266,8 +265,8 @@
               <ion-row
                 class="slider-text"
                 [class.disabled]="this.parameterToggle[2]">
-                <div class="lato-r caption">up</div>
-                <div class="lato-r caption">down</div>
+                <div class="lato-r angle">up</div>
+                <div class="lato-r angle">down</div>
               </ion-row>
 
               <ion-row class="blinds-angle">
@@ -281,8 +280,8 @@
                   max="100"
                   step="25"
                   snaps="true"
-                  pin="true"
                   mode="md"
+                  class="angle-range"
                   [disabled]="this.parameterToggle[2] || this.blindsRangeVal === 0"
                   [(ngModel)]="this.blindsRangeAngle"
                   (ionChange)="sliderBlindsChange()">
@@ -291,8 +290,8 @@
               <ion-row
                 [class.disabled]="this.parameterToggle[2]"
                 class="slider-text">
-                <div class="lato-r caption">more light</div>
-                <div class="lato-r caption">less light</div>
+                <div class="lato-r angle">more light</div>
+                <div class="lato-r angle">less light</div>
               </ion-row>
 
               <ion-row class="blinds-1">
@@ -305,7 +304,6 @@
                   max="100"
                   step="25"
                   snaps="true"
-                  pin="true"
                   mode="md"
                   [disabled]="this.parameterToggle[2]"
                   [(ngModel)]="this.blindsRangeVal2"
@@ -315,8 +313,8 @@
               <ion-row
                 class="slider-text"
                 [class.disabled]="this.parameterToggle[2]">
-                <div class="lato-r caption">up</div>
-                <div class="lato-r caption">down</div>
+                <div class="lato-r angle">up</div>
+                <div class="lato-r angle">down</div>
               </ion-row>
 
               <ion-row class="blinds-angle">
@@ -330,7 +328,6 @@
                   max="100"
                   step="25"
                   snaps="true"
-                  pin="true"
                   mode="md"
                   [disabled]="this.parameterToggle[2] || this.blindsRangeVal2 === 0"
                   [(ngModel)]="this.blindsRangeAngle2"
@@ -340,8 +337,8 @@
               <ion-row
                 [class.disabled]="this.parameterToggle[2]"
                 class="slider-text">
-                <div class="lato-r caption">more light</div>
-                <div class="lato-r caption">less light</div>
+                <div class="lato-r angle">more light</div>
+                <div class="lato-r angle">less light</div>
               </ion-row>
             </ion-grid>
           </ion-slide>
@@ -358,8 +355,15 @@
               <ion-row class="active-card-title">
                 <ion-text
                   class="active-card-title lato-bl"
-                  [class.disabled]="this.parameterToggle[3]">
+                  [class.disabled]="this.parameterToggle[3]"
+                  *ngIf="this.innerWidth >= 410">
                   {{this.parameter[3].name}}
+                </ion-text>
+                <ion-text
+                  class="active-card-title lato-bl"
+                  [class.disabled]="this.parameterToggle[3]"
+                  *ngIf="this.innerWidth < 410">
+                  {{this.parameter[3].tag}}
                 </ion-text>
                 <ion-toggle
                   class="active-card-toggle manual-auto"
@@ -390,12 +394,16 @@
               <div class="ac">
                 <div class="ac-col">
                   <div>
-                    <ion-label [class.disabled]="this.parameterToggle[3]" class="lato-r">
+                    <ion-label
+                      [class.disabled]="this.parameterToggle[3]"
+                      class="lato-r">
                       <b>SET TO:</b> (°C)
                     </ion-label>
                     <ion-input
                       type="number"
                       class="lato-bl number-input"
+                      [class.disabled]="this.parameterToggle[3]"
+                      [disabled]="this.parameterToggle[3]"
                       value={{this.acSliderVal}}
                       min="16"
                       max="30"></ion-input>
@@ -409,6 +417,8 @@
                     <ion-button
                       size="small"
                       class="ac-btn"
+                      [disabled]="this.parameterValues[3] === 'off' ||
+                      this.parameterToggle[3]"
                       (click)="onClickReduce()"
                       [style.--background]="this.fanReduce ?
                       'var(--ion-color-danger)' : 'var(--ion-color-light)'">
@@ -417,6 +427,8 @@
                     <ion-button
                       size="small"
                       class="ac-btn"
+                      [disabled]="this.parameterValues[3] === 'off' ||
+                      this.parameterToggle[3]"
                       (click)="onClickSwitchOff()"
                       [style.--background]="this.fanOff ?
                       'var(--ion-color-danger)' : 'var(--ion-color-light)'">
@@ -434,14 +446,15 @@
                     min="16"
                     max="30"
                     step="1"
+                    [class.disabled]="this.parameterToggle[3]"
                     [disabled]="this.parameterToggle[3]"
-                    (ngModelChange)="logs()"
+                    (ngModelChange)="changeTemperature()"
                     [(ngModel)]="this.acSliderVal" />
                 </div>
 
                 <!-- <ion-row class="slider-text">
-                <div class="lato-r caption">0</div>
-                <div class="lato-r caption">100%</div>
+                <div class="lato-r angle">0</div>
+                <div class="lato-r angle">100%</div>
               </ion-row> -->
               </div>
             </ion-grid>

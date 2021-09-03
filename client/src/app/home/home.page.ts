@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, HostListener, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { OnInit } from '@angular/core';
 import { IonSlides } from '@ionic/angular';
@@ -11,6 +11,8 @@ import { IonSlides } from '@ionic/angular';
 export class HomePage implements OnInit {
   @ViewChild('cards') cards: IonSlides;
   @ViewChild('activeCard') activeCard: IonSlides;
+
+  public innerWidth: any;
 
   lights: any;
   lightChangeValues = {};
@@ -29,7 +31,7 @@ export class HomePage implements OnInit {
   fanOff = false;
   fanReduce = false;
 
-  parameterValues = ['off', 'closed', 'up', '23°C'];
+  parameterValues = ['off', 'closed', 'up', 'off'];
 
   mainToggle = false;
   parameterToggle = [false, false, false, false];
@@ -52,24 +54,28 @@ export class HomePage implements OnInit {
     {
       id: '0',
       name: 'LIGHTS',
+      tag: 'L',
       currentValue: 'off',
       path: 'assets/custom/lights-icon.svg'
     },
     {
       id: '1',
       name: 'WINDOWS',
+      tag: 'W',
       currentValue: 'open',
       path: 'assets/custom/windows-icon.svg'
     },
     {
       id: '2',
       name: 'BLINDS',
+      tag: 'B',
       currentValue: 'up',
       path: 'assets/custom/blinds-icon.svg'
     },
     {
       id: '3',
       name: 'AIR CONDITIONER',
+      tag: 'AC',
       currentValue: '20°C',
       path: 'assets/custom/temperature-icon.svg'
     }
@@ -79,6 +85,11 @@ export class HomePage implements OnInit {
   private hueApiUrl = `http://192.168.0.24/api/${this.username}/lights`;
 
   constructor(private http: HttpClient) { }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.innerWidth = window.innerWidth;
+  }
 
   onMainToggle() {
     for (let i = 0; i < this.parameterToggle.length; i++) {
@@ -198,19 +209,20 @@ export class HomePage implements OnInit {
 
   // BLINDS SLIDER
   sliderBlindsChange() {
-    console.log(this.blindsRangeAngle, this.blindsRangeAngle2);
     if (this.blindsRangeVal === 100 && this.blindsRangeVal2 === 100) {
       this.parameterValues[2] = 'down';
     }
-    if (this.blindsRangeVal === 0 && this.blindsRangeVal === 0) {
+    else if (this.blindsRangeVal === 0 && this.blindsRangeVal2 === 0) {
       this.parameterValues[2] = 'up';
     }
-    console.log(this.parameterValues[2], this.blindsRangeVal);
+    else {
+      this.parameterValues[2] = 'partially down';
+    }
   }
 
   // TEMPERATURE SLIDER
-  logs() {
-    console.log(this.acSliderVal);
+  changeTemperature() {
+    this.parameterValues[3] = 'on';
   }
 
   // CHANGE LIGHT OFF/ON/BRI
@@ -229,6 +241,8 @@ export class HomePage implements OnInit {
 
 
   ngOnInit(): void {
+    this.innerWidth = window.innerWidth;
+
     this.http.get(`${this.hueApiUrl}/1`)
       .subscribe(
         data => {
@@ -250,6 +264,5 @@ export class HomePage implements OnInit {
         }
       );
   }
-
 }
 

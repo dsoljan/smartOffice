@@ -57,7 +57,7 @@ ion-button {
 }
 
 ion-range {
-  --knob-size: 50px !important;
+  --knob-size: 33px !important;
   --bar-height: 0.5rem;
   --bar-background: var(--ion-color-medium);
   --bar-background-active: #313133;
@@ -152,8 +152,4 @@ input[type=range]:focus::-ms-fill-lower {
 }
 input[type=range]:focus::-ms-fill-upper {
   background: #C5D6D8;
-}
-
-body > app-root > ion-app > ion-router-outlet > app-home > ion-content > div > div > div.cards-container > ion-slides.active-slides.md.slides-md.swiper-container.hydrated.swiper-container-initialized.swiper-container-horizontal > div > ion-slide.active-card.md.swiper-slide.swiper-zoom-container.hydrated.swiper-slide-active > ion-grid > ion-row.ac-row.md.hydrated > ion-col.ac-col.ac-padding.md.hydrated > div > ion-input > input {
-  width: 40px !important;
 }

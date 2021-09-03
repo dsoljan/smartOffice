@@ -1,4 +1,5 @@
-<ion-grid class="card-grid">
+<ion-grid
+  class="card-grid">
   <ion-row class="icon-row">
     <img class="card-icon" src={{parameter.path}} />
     <ion-toggle
@@ -8,7 +9,7 @@
     </ion-toggle>
   </ion-row>
   <ion-row class="card-row" [class.disabled]="toggles[parameter.id]">
-    <ion-card class="sensor-card">
+    <ion-card class="slide-card">
       <ion-card-title class="lato-bl title">
         {{parameter.name}}
       </ion-card-title>
