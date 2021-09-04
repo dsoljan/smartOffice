@@ -38,15 +38,26 @@
   }
 }
 
-.page-title {
-  font-size: 1.3rem;
-  letter-spacing: 1px;
-  padding-left: 1rem;
-  padding-top: 1rem;
+.header {
+  width: 100%;
+  padding: 1rem 1rem 0 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
 
   @media (min-width: 768px) {
     padding-top: 0;
   }
+}
+
+.header-icon {
+  font-size: 1.8em;
+}
+
+.page-title {
+  font-size: 1.4em;
+  letter-spacing: 1px;
 }
 
 .mode-container {

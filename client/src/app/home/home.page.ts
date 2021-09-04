@@ -1,7 +1,9 @@
 import { Component, HostListener, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { OnInit } from '@angular/core';
-import { IonSlides } from '@ionic/angular';
+import { IonSlides, ModalController } from '@ionic/angular';
+import { Observable, Timestamp } from 'rxjs';
+import { ModalPage } from './modal/modal.page';
 
 @Component({
   selector: 'app-home',
@@ -35,6 +37,10 @@ export class HomePage implements OnInit {
 
   mainToggle = false;
   parameterToggle = [false, false, false, false];
+
+  latitude: number;
+  longitude: number;
+  timestamp: any; //??
 
   slideOptions = {
     slidesPerView: 'auto',
@@ -83,12 +89,41 @@ export class HomePage implements OnInit {
 
   private username = 'JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW';
   private hueApiUrl = `http://192.168.0.24/api/${this.username}/lights`;
+  private weatherKey = 'ae53ddd2cb67d8731685ad6e11547cbd';
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    public modalController: ModalController
+  ) { }
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.innerWidth = window.innerWidth;
+  }
+
+  async presentModal() {
+    const modal = await this.modalController.create({
+      component: ModalPage,
+      componentProps: {
+        latitude: this.latitude,
+        longitude: this.longitude
+      }
+    });
+
+    modal.onDidDismiss().then(data => {
+      console.log(data);
+    });
+    return await modal.present();
+  }
+
+  getPosition(): Observable<any> {
+    return new Observable(observer => {
+      window.navigator.geolocation.getCurrentPosition(position => {
+        observer.next(position);
+        observer.complete();
+      },
+        error => observer.error(error));
+    });
   }
 
   onMainToggle() {
@@ -263,6 +298,12 @@ export class HomePage implements OnInit {
           console.log(err);
         }
       );
+
+    this.getPosition().subscribe(pos => {
+      this.timestamp = pos.timestamp;
+      this.latitude = pos.coords.latitude;
+      this.longitude = pos.coords.longitude;
+    });
   }
 }
 

@@ -153,3 +153,21 @@ input[type=range]:focus::-ms-fill-lower {
 input[type=range]:focus::-ms-fill-upper {
   background: #C5D6D8;
 }
+
+button:focus {
+  outline: none;
+}
+
+button {
+  color: var(--ion-color-dark);
+  background-color: transparent;
+}
+
+.modal-wrapper.sc-ion-modal-md, .modal-shadow.sc-ion-modal-md {
+  @media (min-width: 768px) {
+    height: 720px;
+    border: solid 1px black;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+    border-radius: 2%;
+  }
+}

@@ -1,0 +1,80 @@
+<ion-header translucent class="ion-no-border">
+  <ion-toolbar>
+    <ion-title class="lato-bl title">
+      PREFERENCES
+    </ion-title>
+    <ion-buttons slot="end">
+      <button (click)="closeModal()">
+        <ion-icon class="close-btn" name="close-outline"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen>
+  <form [formGroup]="preferences">
+    <ion-list mode="ios">
+      <ion-list-header class="lato-bo li-header">
+        General
+      </ion-list-header>
+      <ion-item disabled>
+        <ion-checkbox
+          color="dark"
+          formControlName="remoteAccess"
+          slot="start">
+        </ion-checkbox>
+        <ion-label class="list-label">Enable remote access</ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list mode="ios">
+      <ion-list-header class="lato-bo li-header">
+        Automatic mode
+      </ion-list-header>
+      <ion-item>
+        <ion-checkbox
+          color="dark"
+          slot="start"
+          formControlName="turnOnSunset">
+        </ion-checkbox>
+        <ion-label class="list-label">Turn on lights after sunset</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-checkbox
+          color="dark"
+          slot="start"
+          formControlName="turnOnOvercast">
+        </ion-checkbox>
+        <ion-label class="list-label">
+          Turn on lights in case of overcast <br />(95% clouds)</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-checkbox
+          color="dark"
+          slot="start"
+          formControlName="turnOnAt">
+        </ion-checkbox>
+        <ion-label class="list-label">
+          Turn on lights at
+          <ion-datetime
+            formControlName="turnOnAtVal"
+            displayFormat="H:mm"
+            placeholder="7:00"></ion-datetime>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-checkbox
+          color="dark"
+          slot="start"
+          formControlName="turnOffAt">
+        </ion-checkbox>
+        <ion-label class="list-label">
+          Turn off lights at
+          <ion-datetime
+            formControlName="turnOffAtVal"
+            displayFormat="H:mm"
+            placeholder="9:00"></ion-datetime>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </form>
+</ion-content>

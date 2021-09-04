@@ -1,8 +1,12 @@
 <ion-content>
   <div class="homepage">
     <div class="dashboard">
-      <ion-text class="page-title lato-bl">DASHBOARD</ion-text>
-
+      <div class="header">
+        <ion-text class="page-title lato-bl">DASHBOARD</ion-text>
+        <button (click)="presentModal()">
+          <ion-icon class="header-icon" name="options-outline"></ion-icon>
+        </button>
+      </div>
       <div class="mode-container">
         <div class="mode-text lato-bo">Mode:</div>
         <div class="toggle-container">
@@ -329,6 +333,7 @@
                   step="25"
                   snaps="true"
                   mode="md"
+                  class="angle-range"
                   [disabled]="this.parameterToggle[2] || this.blindsRangeVal2 === 0"
                   [(ngModel)]="this.blindsRangeAngle2"
                   (ionChange)="sliderBlindsChange()">
