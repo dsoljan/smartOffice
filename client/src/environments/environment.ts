@@ -3,7 +3,13 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  username: 'JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW',
+  hueApiUrl: `http://192.168.0.24/api/JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW/lights`,
+  weatherApiKey: 'ae53ddd2cb67d8731685ad6e11547cbd',
+  weatherURL: 'https://api.openweathermap.org/data/2.5/onecall?lat=',
+  weatherExclusion: 'minutely,hourly,daily',
+  weatherUnits: 'metric',
 };
 
 /*

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ModalController, NavParams } from '@ionic/angular';
 
 @Component({
@@ -8,38 +7,49 @@ import { ModalController, NavParams } from '@ionic/angular';
   styleUrls: ['./modal.page.scss'],
 })
 export class ModalPage implements OnInit {
-  preferences: FormGroup;
+  formData = [false, false, false, false, '', false, ''];
+  // turnOnAt: any;
+  // turnOffAt: any;
+
+  dateNow: Date;
+  dateString: string;
+  hourNow: string;
 
   constructor(
-    private formBuilder: FormBuilder,
     private modalController: ModalController,
     private params: NavParams
   ) {
-    this.preferences = this.formBuilder.group({
-      remoteAccess: new FormControl(false),
-      turnOnSunset: new FormControl(false),
-      turnOnOvercast: new FormControl(false),
-      turnOnAt: new FormControl(false),
-      turnOnAtVal: new FormControl(''),
-      turnOffAt: new FormControl(false),
-      turnOffAtVal: new FormControl(''),
-    });
+    this.dateNow = new Date();
+    this.dateString = this.dateNow.toLocaleString();
+    this.hourNow =
+      this.dateNow.getHours().toString() +
+      ':' +
+      (this.dateNow.getMinutes() < 10 ? '0' : '') +
+      this.dateNow.getMinutes().toString();
+  }
+
+  addOffValue() {
+    if (this.formData[5]) {
+      this.formData[6] = this.dateString;
+    }
+  }
+
+  addOnValue() {
+    if (this.formData[3]) {
+      this.formData[4] = this.dateString;
+    }
   }
 
   async closeModal() {
-    console.log(this.preferences.value);
-    await this.modalController.dismiss(this.preferences);
+    await this.modalController.dismiss();
+  }
+
+  async saveChanges() {
+    console.log(this.formData);
+    await this.modalController.dismiss(this.formData);
   }
 
   ngOnInit() {
     console.log(this.params);
   }
-
-  get remoteAccess() { return this.preferences.get('remoteAccess'); }
-  get turnOnSunset() { return this.preferences.get('turnOnSunset'); }
-  get turnOnOvercast() { return this.preferences.get('turnOnOvercast'); }
-  get turnOnAt() { return this.preferences.get('turnOnAt'); }
-  get turnOnAtVal() { return this.preferences.get('turnOnAtVal'); }
-  get turnOffAt() { return this.preferences.get('turnOffAt'); }
-  get turnOffAtVal() { return this.preferences.get('turnOffAtVal'); }
 }

@@ -2,7 +2,7 @@ import { Component, HostListener, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { OnInit } from '@angular/core';
 import { IonSlides, ModalController } from '@ionic/angular';
-import { Observable, Timestamp } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { ModalPage } from './modal/modal.page';
 
 @Component({
@@ -41,19 +41,20 @@ export class HomePage implements OnInit {
   latitude: number;
   longitude: number;
   timestamp: any; //??
+  weatherSubscription: Subscription;
 
   slideOptions = {
     slidesPerView: 'auto',
     zoom: false,
     grabCursor: true,
     spaceBetween: 20,
-    pagination: false
+    pagination: false,
   };
 
   slideOptions2 = {
     slidesPerView: 1,
     zoom: false,
-    allowTouchMove: false
+    allowTouchMove: false,
   };
 
   parameter = [
@@ -62,39 +63,39 @@ export class HomePage implements OnInit {
       name: 'LIGHTS',
       tag: 'L',
       currentValue: 'off',
-      path: 'assets/custom/lights-icon.svg'
+      path: 'assets/custom/lights-icon.svg',
     },
     {
       id: '1',
       name: 'WINDOWS',
       tag: 'W',
       currentValue: 'open',
-      path: 'assets/custom/windows-icon.svg'
+      path: 'assets/custom/windows-icon.svg',
     },
     {
       id: '2',
       name: 'BLINDS',
       tag: 'B',
       currentValue: 'up',
-      path: 'assets/custom/blinds-icon.svg'
+      path: 'assets/custom/blinds-icon.svg',
     },
     {
       id: '3',
       name: 'AIR CONDITIONER',
       tag: 'AC',
       currentValue: '20°C',
-      path: 'assets/custom/temperature-icon.svg'
-    }
+      path: 'assets/custom/temperature-icon.svg',
+    },
   ];
 
   private username = 'JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW';
   private hueApiUrl = `http://192.168.0.24/api/${this.username}/lights`;
-  private weatherKey = 'ae53ddd2cb67d8731685ad6e11547cbd';
+  // private weatherKey = 'ae53ddd2cb67d8731685ad6e11547cbd';
 
   constructor(
     private http: HttpClient,
     public modalController: ModalController
-  ) { }
+  ) {}
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
@@ -106,23 +107,25 @@ export class HomePage implements OnInit {
       component: ModalPage,
       componentProps: {
         latitude: this.latitude,
-        longitude: this.longitude
-      }
+        longitude: this.longitude,
+      },
     });
 
-    modal.onDidDismiss().then(data => {
-      console.log(data);
+    modal.onDidDismiss().then((data) => {
+      console.log(data.data);
     });
     return await modal.present();
   }
 
   getPosition(): Observable<any> {
-    return new Observable(observer => {
-      window.navigator.geolocation.getCurrentPosition(position => {
-        observer.next(position);
-        observer.complete();
-      },
-        error => observer.error(error));
+    return new Observable((observer) => {
+      window.navigator.geolocation.getCurrentPosition(
+        (position) => {
+          observer.next(position);
+          observer.complete();
+        },
+        (error) => observer.error(error)
+      );
     });
   }
 
@@ -133,7 +136,7 @@ export class HomePage implements OnInit {
   }
 
   changeActiveCard() {
-    this.cards.getSwiper().then(el => {
+    this.cards.getSwiper().then((el) => {
       this.activeCard.slideTo(el.clickedIndex);
       this.cards.slideTo(el.clickedIndex);
     });
@@ -221,12 +224,15 @@ export class HomePage implements OnInit {
       this.lightChange('on', true);
       this.lightChange('bri', this.hueLightsRangeVal);
       this.parameterValues[0] = 'on';
-    }
-    else {
+    } else {
       this.lightChange('on', false);
       this.parameterValues[0] = 'off';
     }
-    console.log(this.parameterValues[0], this.lightsRangeVal, this.hueLightsRangeVal);
+    console.log(
+      this.parameterValues[0],
+      this.lightsRangeVal,
+      this.hueLightsRangeVal
+    );
   }
 
   // WINDOWS TOGGLES
@@ -246,11 +252,9 @@ export class HomePage implements OnInit {
   sliderBlindsChange() {
     if (this.blindsRangeVal === 100 && this.blindsRangeVal2 === 100) {
       this.parameterValues[2] = 'down';
-    }
-    else if (this.blindsRangeVal === 0 && this.blindsRangeVal2 === 0) {
+    } else if (this.blindsRangeVal === 0 && this.blindsRangeVal2 === 0) {
       this.parameterValues[2] = 'up';
-    }
-    else {
+    } else {
       this.parameterValues[2] = 'partially down';
     }
   }
@@ -263,47 +267,44 @@ export class HomePage implements OnInit {
   // CHANGE LIGHT OFF/ON/BRI
   lightChange(property, propertyValue) {
     this.lightChangeValues[property] = propertyValue;
-    this.http.put(
-      `${this.hueApiUrl}/1/state`, this.lightChangeValues
-    )
+    this.http
+      .put(`${this.hueApiUrl}/1/state`, this.lightChangeValues)
       .subscribe(
-        data => { console.log(data); },
-        err => {
+        (data) => {
+          console.log(data);
+        },
+        (err) => {
           console.log(err);
         }
       );
   }
 
-
   ngOnInit(): void {
     this.innerWidth = window.innerWidth;
 
-    this.http.get(`${this.hueApiUrl}/1`)
-      .subscribe(
-        data => {
-          this.lights = Object.values(data)[0];
-          this.hueLightsRangeVal = this.lights.bri;
-          this.lightsRangeVal = Math.floor(this.hueLightsRangeVal / 2.54);
-          if (this.lights.on) {
-            this.parameterValues[0] = 'on';
-          }
-          else {
-            this.parameterValues[0] = 'off';
-            this.lightsRangeVal = 0;
-            this.hueLightsRangeVal = 0;
-          }
-          console.log(this.parameterValues[0], this.lightsRangeVal);
-        },
-        err => {
-          console.log(err);
+    this.http.get(`${this.hueApiUrl}/1`).subscribe(
+      (data) => {
+        this.lights = Object.values(data)[0];
+        this.hueLightsRangeVal = this.lights.bri;
+        this.lightsRangeVal = Math.floor(this.hueLightsRangeVal / 2.54);
+        if (this.lights.on) {
+          this.parameterValues[0] = 'on';
+        } else {
+          this.parameterValues[0] = 'off';
+          this.lightsRangeVal = 0;
+          this.hueLightsRangeVal = 0;
         }
-      );
+        console.log(this.parameterValues[0], this.lightsRangeVal);
+      },
+      (err) => {
+        console.log(err);
+      }
+    );
 
-    this.getPosition().subscribe(pos => {
+    this.getPosition().subscribe((pos) => {
       this.timestamp = pos.timestamp;
       this.latitude = pos.coords.latitude;
       this.longitude = pos.coords.longitude;
     });
   }
 }
-

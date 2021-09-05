@@ -20,3 +20,27 @@ ion-content {
 .list-label {
   padding: 0.5rem 0;
 }
+
+.list-label-1 {
+  padding: 1rem 0;
+}
+
+.disable-time {
+  pointer-events: none;
+}
+
+.main-btn {
+  margin-top: 2rem;
+  --box-shadow: none;
+  --border-width: 1.5px;
+  --border-color: var(--ion-color-dark);
+  --background: var(--ion-color-light);
+  --border-style: solid;
+  font-size: 1rem;
+}
+
+.btn-div {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
