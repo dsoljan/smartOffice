@@ -9,7 +9,6 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { SideCardComponent } from './side-card/side-card.component';
 import { HttpClientModule } from '@angular/common/http';
 
-
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
@@ -18,8 +17,8 @@ import { HttpClientModule } from '@angular/common/http';
     ReactiveFormsModule,
     IonicModule,
     HomePageRoutingModule,
-    HttpClientModule
+    HttpClientModule,
   ],
-  declarations: [HomePage, SideCardComponent]
+  declarations: [HomePage, SideCardComponent],
 })
-export class HomePageModule { }
+export class HomePageModule {}

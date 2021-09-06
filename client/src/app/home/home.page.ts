@@ -1,16 +1,24 @@
-import { Component, HostListener, ViewChild } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnChanges,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { OnInit } from '@angular/core';
 import { IonSlides, ModalController } from '@ionic/angular';
-import { Observable, Subscription } from 'rxjs';
+import { interval, Observable, Subscription } from 'rxjs';
 import { ModalPage } from './modal/modal.page';
+import { WeatherService } from 'src/services/weather.service';
+import { element } from 'protractor';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnChanges, OnDestroy {
   @ViewChild('cards') cards: IonSlides;
   @ViewChild('activeCard') activeCard: IonSlides;
 
@@ -40,8 +48,11 @@ export class HomePage implements OnInit {
 
   latitude: number;
   longitude: number;
-  timestamp: any; //??
   weatherSubscription: Subscription;
+  sunsetTimestamp: any;
+  cloudiness: any;
+
+  nr: number;
 
   slideOptions = {
     slidesPerView: 'auto',
@@ -89,11 +100,11 @@ export class HomePage implements OnInit {
   ];
 
   private username = 'JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW';
-  private hueApiUrl = `http://192.168.0.24/api/${this.username}/lights`;
-  // private weatherKey = 'ae53ddd2cb67d8731685ad6e11547cbd';
+  private hueApiUrl = `http://192.168.0.24/api/${this.username}`;
 
   constructor(
     private http: HttpClient,
+    private weatherService: WeatherService,
     public modalController: ModalController
   ) {}
 
@@ -112,7 +123,66 @@ export class HomePage implements OnInit {
     });
 
     modal.onDidDismiss().then((data) => {
-      console.log(data.data);
+      const formData = data.data;
+      const turnOnTime = formData[4].slice(11, 16);
+      const turnOffTime = formData[6].slice(11, 16);
+
+      // remote access not set
+      // localStorage.setItem('turnOnOvercast', formData[1].toString());
+      // localStorage.setItem('turnOnSunset', formData[2].toString());
+
+      // SCHEDULE TURN ON
+      if (
+        this.parameterToggle[0] &&
+        formData[4] !== '' &&
+        formData[4] !== localStorage.getItem('turnOnAtVal')
+      ) {
+        localStorage.setItem('turnOnAt', formData[3].toString());
+        localStorage.setItem('turnOnAtVal', formData[4].toString());
+
+        const payload = {
+          name: 'Turn On',
+          command: {
+            address:
+              '/api/JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW/groups/0/action',
+            method: 'PUT',
+            body: {
+              on: true,
+            },
+          },
+          localtime: 'W127/T' + turnOnTime + ':00',
+        };
+        JSON.stringify(payload);
+        this.lightChangeAuto(payload, 1);
+      }
+
+      // SCHEDULE TURN OFF
+      if (
+        this.parameterToggle[0] &&
+        formData[6] !== '' &&
+        formData[6] !== localStorage.getItem('turnOffAtVal')
+      ) {
+        localStorage.setItem('turnOffAt', formData[5].toString());
+        localStorage.setItem('turnOffAtVal', formData[6].toString());
+
+        const payload = {
+          name: 'Turn Off',
+          command: {
+            address:
+              '/api/JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW/groups/0/action',
+            method: 'PUT',
+            body: {
+              on: false,
+            },
+          },
+          localtime: 'W127/T' + turnOffTime + ':00',
+        };
+        JSON.stringify(payload);
+        this.lightChangeAuto(payload, 2);
+        this.lightsRangeVal = 0;
+      }
+
+      console.log('posli', localStorage);
     });
     return await modal.present();
   }
@@ -233,6 +303,10 @@ export class HomePage implements OnInit {
       this.lightsRangeVal,
       this.hueLightsRangeVal
     );
+
+    if (!this.parameterToggle[0]) {
+      this.mainToggle = false;
+    }
   }
 
   // WINDOWS TOGGLES
@@ -268,7 +342,7 @@ export class HomePage implements OnInit {
   lightChange(property, propertyValue) {
     this.lightChangeValues[property] = propertyValue;
     this.http
-      .put(`${this.hueApiUrl}/1/state`, this.lightChangeValues)
+      .put(`${this.hueApiUrl}/lights/1/state`, this.lightChangeValues)
       .subscribe(
         (data) => {
           console.log(data);
@@ -279,10 +353,23 @@ export class HomePage implements OnInit {
       );
   }
 
+  // LIGHT SCHEDULE
+  lightChangeAuto(payload, num) {
+    this.http.put(`${this.hueApiUrl}/schedules/${num}`, payload).subscribe(
+      (data) => {
+        console.log(data);
+        console.log(payload);
+      },
+      (err) => {
+        console.log(err);
+      }
+    );
+  }
+
   ngOnInit(): void {
     this.innerWidth = window.innerWidth;
 
-    this.http.get(`${this.hueApiUrl}/1`).subscribe(
+    this.http.get(`${this.hueApiUrl}/lights/1`).subscribe(
       (data) => {
         this.lights = Object.values(data)[0];
         this.hueLightsRangeVal = this.lights.bri;
@@ -302,9 +389,38 @@ export class HomePage implements OnInit {
     );
 
     this.getPosition().subscribe((pos) => {
-      this.timestamp = pos.timestamp;
       this.latitude = pos.coords.latitude;
       this.longitude = pos.coords.longitude;
+
+      this.getWeatherData();
+
+      this.weatherSubscription = interval(1000000).subscribe(() => {
+        this.getWeatherData();
+
+        // lights auto mode
+        if (this.parameterToggle[0]) {
+        }
+      });
     });
+  }
+
+  ngOnChanges() {}
+
+  getWeatherData() {
+    this.weatherService
+      .getCurrentWeather(this.latitude, this.longitude)
+      .subscribe((res) => {
+        this.cloudiness = Object.values(res)[4].clouds;
+        this.sunsetTimestamp = Object.values(res)[4].sunset;
+
+        console.log(res);
+      });
+  }
+
+  ngOnDestroy() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    this.weatherSubscription
+      ? this.weatherSubscription.unsubscribe
+      : delete this.weatherSubscription;
   }
 }

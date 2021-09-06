@@ -50,14 +50,14 @@
         <ion-checkbox
           color="dark"
           slot="start"
-          [(ngModel)]="formData[3]"
-          (ngModelChange)="addOnValue()">
+          [(ngModel)]="formData[3]">
         </ion-checkbox>
         <ion-label class="list-label">
           Turn on lights at
           <ion-datetime
             [class.disable-time]="!formData[3]"
             displayFormat="HH:mm"
+            pickerFormat="HH:mm"
             [(ngModel)]="formData[4]"
             placeholder={{this.hourNow}}
           ></ion-datetime>
@@ -67,7 +67,6 @@
         <ion-checkbox
           color="dark"
           [(ngModel)]="formData[5]"
-          (ngModelChange)="addOffValue()"
           slot="start">
         </ion-checkbox>
         <ion-label class="list-label">
@@ -75,6 +74,7 @@
           <ion-datetime
             [class.disable-time]="!formData[5]"
             displayFormat="HH:mm"
+            pickerFormat="HH:mm"
             [(ngModel)]="formData[6]"
             placeholder={{this.hourNow}}>
           </ion-datetime>

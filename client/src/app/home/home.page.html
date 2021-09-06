@@ -65,7 +65,6 @@
                   class="active-card-toggle manual-auto"
                   [(ngModel)]="this.parameterToggle[0]"
                   mode="ios">
-                  <!-- (ionChange)="changeLightsToggle()" -->
                 </ion-toggle>
               </ion-row>
 
@@ -114,6 +113,8 @@
                 <div class="lato-r angle">0</div>
                 <div class="lato-r angle">100%</div>
               </ion-row>
+              <button>{{this.cloudiness}}</button>
+              <div>{{this.sunsetTimestamp}}</div>
             </ion-grid>
           </ion-slide>
 

@@ -8,36 +8,40 @@ import { ModalController, NavParams } from '@ionic/angular';
 })
 export class ModalPage implements OnInit {
   formData = [false, false, false, false, '', false, ''];
-  // turnOnAt: any;
-  // turnOffAt: any;
+
+  turnOnAt: string;
+  turnOffAt: string;
 
   dateNow: Date;
-  dateString: string;
   hourNow: string;
+
+  required1: boolean;
 
   constructor(
     private modalController: ModalController,
     private params: NavParams
   ) {
+    // localStorage.clear();
     this.dateNow = new Date();
-    this.dateString = this.dateNow.toLocaleString();
     this.hourNow =
       this.dateNow.getHours().toString() +
       ':' +
       (this.dateNow.getMinutes() < 10 ? '0' : '') +
       this.dateNow.getMinutes().toString();
-  }
 
-  addOffValue() {
-    if (this.formData[5]) {
-      this.formData[6] = this.dateString;
-    }
-  }
+    this.required1 = this.formData[3] === 'true';
 
-  addOnValue() {
-    if (this.formData[3]) {
-      this.formData[4] = this.dateString;
-    }
+    // ensure string to boolean
+    // this.formData[1] = localStorage.getItem('turnOnOvercast');
+    // this.formData[1] = this.formData[1] === 'true';
+    // this.formData[2] = localStorage.getItem('turnOnSunset');
+    // this.formData[2] = this.formData[2] === 'true';
+    this.formData[3] = localStorage.getItem('turnOnAt');
+    this.formData[3] = this.formData[3] === 'true';
+    this.formData[4] = localStorage.getItem('turnOnAtVal');
+    this.formData[5] = localStorage.getItem('turnOffAt');
+    this.formData[5] = this.formData[5] === 'true';
+    this.formData[6] = localStorage.getItem('turnOffAtVal');
   }
 
   async closeModal() {
@@ -45,7 +49,16 @@ export class ModalPage implements OnInit {
   }
 
   async saveChanges() {
-    console.log(this.formData);
+    if (!this.formData[3] || this.formData[4] === '') {
+      this.formData[3] = false;
+      this.formData[4] = '';
+    }
+
+    if (!this.formData[5] || this.formData[6] === '') {
+      this.formData[5] = false;
+      this.formData[6] = '';
+    }
+
     await this.modalController.dismiss(this.formData);
   }
 
