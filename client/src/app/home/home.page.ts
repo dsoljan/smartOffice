@@ -8,7 +8,7 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { OnInit } from '@angular/core';
 import { IonSlides, ModalController } from '@ionic/angular';
-import { interval, Observable, Subscription } from 'rxjs';
+import { interval, Observable, Subscription, Timestamp } from 'rxjs';
 import { ModalPage } from './modal/modal.page';
 import { WeatherService } from 'src/services/weather.service';
 import { element } from 'protractor';
@@ -49,15 +49,15 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
   latitude: number;
   longitude: number;
   weatherSubscription: Subscription;
-  sunsetTimestamp: any;
-  cloudiness: any;
+  sunsetTimestamp: number;
+  sunsetTime: string;
+  cloudiness: number;
 
   nr: number;
 
   slideOptions = {
     slidesPerView: 'auto',
     zoom: false,
-    grabCursor: true,
     spaceBetween: 20,
     pagination: false,
   };
@@ -124,12 +124,20 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
 
     modal.onDidDismiss().then((data) => {
       const formData = data.data;
+      console.log(formData);
       const turnOnTime = formData[4].slice(11, 16);
       const turnOffTime = formData[6].slice(11, 16);
 
       // remote access not set
-      // localStorage.setItem('turnOnOvercast', formData[1].toString());
-      // localStorage.setItem('turnOnSunset', formData[2].toString());
+      // CLOUDINESS TURN ON
+      if (this.parameterToggle[0]) {
+        localStorage.setItem('turnOnOvercast', formData[1].toString());
+      }
+
+      // SUNSET TURN ON
+      if (this.parameterToggle[0]) {
+        localStorage.setItem('turnOnSunset', formData[2].toString());
+      }
 
       // SCHEDULE TURN ON
       if (
@@ -141,7 +149,7 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
         localStorage.setItem('turnOnAtVal', formData[4].toString());
 
         const payload = {
-          name: 'Turn On',
+          name: 'Turn On At',
           command: {
             address:
               '/api/JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW/groups/0/action',
@@ -157,7 +165,7 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
       }
 
       // SCHEDULE TURN OFF
-      if (
+      else if (
         this.parameterToggle[0] &&
         formData[6] !== '' &&
         formData[6] !== localStorage.getItem('turnOffAtVal')
@@ -166,7 +174,7 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
         localStorage.setItem('turnOffAtVal', formData[6].toString());
 
         const payload = {
-          name: 'Turn Off',
+          name: 'Turn Off At',
           command: {
             address:
               '/api/JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW/groups/0/action',
@@ -181,7 +189,6 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
         this.lightChangeAuto(payload, 2);
         this.lightsRangeVal = 0;
       }
-
       console.log('posli', localStorage);
     });
     return await modal.present();
@@ -368,6 +375,7 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit(): void {
     this.innerWidth = window.innerWidth;
+    localStorage.setItem('sunsetTime', '');
 
     this.http.get(`${this.hueApiUrl}/lights/1`).subscribe(
       (data) => {
@@ -394,11 +402,38 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
 
       this.getWeatherData();
 
-      this.weatherSubscription = interval(1000000).subscribe(() => {
+      this.weatherSubscription = interval(18000).subscribe(() => {
         this.getWeatherData();
 
         // lights auto mode
-        if (this.parameterToggle[0]) {
+        if (
+          this.parameterToggle[0] &&
+          localStorage.getItem('turnOnOvercast') === 'true' &&
+          this.cloudiness >= 90
+        ) {
+          this.lightChange('on', true);
+        } else if (
+          this.parameterToggle[0] &&
+          localStorage.getItem('turnOnSunset') === 'true' &&
+          this.sunsetTime !== localStorage.getItem('sunsetTime')
+        ) {
+          localStorage.setItem('sunsetTime', this.sunsetTime);
+          console.log('uspilo', this.sunsetTime);
+          const payload3 = {
+            name: 'Turn Sunset',
+            description: 'nez',
+            command: {
+              address: '/api/JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW/lights/1',
+              method: 'PUT',
+              body: {
+                on: true,
+              },
+            },
+            localtime: 'T:' + this.sunsetTime,
+          };
+          JSON.stringify(payload3);
+          console.log(payload3);
+          this.lightChangeAuto(payload3, 3);
         }
       });
     });
@@ -411,9 +446,11 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
       .getCurrentWeather(this.latitude, this.longitude)
       .subscribe((res) => {
         this.cloudiness = Object.values(res)[4].clouds;
-        this.sunsetTimestamp = Object.values(res)[4].sunset;
+        this.sunsetTimestamp = Object.values(res)[4].sunset * 1000; //js in ms
 
-        console.log(res);
+        this.sunsetTime = new Date(this.sunsetTimestamp).toLocaleTimeString(
+          'en-GB'
+        );
       });
   }
 

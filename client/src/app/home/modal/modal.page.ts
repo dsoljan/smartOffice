@@ -32,10 +32,10 @@ export class ModalPage implements OnInit {
     this.required1 = this.formData[3] === 'true';
 
     // ensure string to boolean
-    // this.formData[1] = localStorage.getItem('turnOnOvercast');
-    // this.formData[1] = this.formData[1] === 'true';
-    // this.formData[2] = localStorage.getItem('turnOnSunset');
-    // this.formData[2] = this.formData[2] === 'true';
+    this.formData[1] = localStorage.getItem('turnOnOvercast');
+    this.formData[1] = this.formData[1] === 'true';
+    this.formData[2] = localStorage.getItem('turnOnSunset');
+    this.formData[2] = this.formData[2] === 'true';
     this.formData[3] = localStorage.getItem('turnOnAt');
     this.formData[3] = this.formData[3] === 'true';
     this.formData[4] = localStorage.getItem('turnOnAtVal');
