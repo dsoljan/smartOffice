@@ -106,15 +106,14 @@
                   pin="true"
                   [disabled]="this.parameterToggle[0]"
                   [(ngModel)]="this.lightsRangeVal"
-                  (ionChange)="sliderLightsChange($event)">
+                  (ionChange)="sliderLightsChange()">
                 </ion-range>
               </ion-row>
               <ion-row class="slider-text">
                 <div class="lato-r angle">0</div>
                 <div class="lato-r angle">100%</div>
               </ion-row>
-              <button>{{this.cloudiness}}</button>
-              <div>{{this.sunsetTimestamp}}</div>
+              <!-- <button>{{this.cloudiness}}</button> -->
             </ion-grid>
           </ion-slide>
 

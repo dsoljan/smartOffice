@@ -10,6 +10,7 @@ export const environment = {
   weatherURL: 'https://api.openweathermap.org/data/2.5/onecall?lat=',
   weatherExclusion: 'minutely,hourly,daily',
   weatherUnits: 'metric',
+  googleApiKey: 'AIzaSyBgZGBGP7CLEV-QsJMj1pUGqQ0rCfTZm4Q',
 };
 
 /*

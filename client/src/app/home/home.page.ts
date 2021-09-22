@@ -1,24 +1,24 @@
 import {
+  AfterViewInit,
   Component,
   HostListener,
-  OnChanges,
   OnDestroy,
   ViewChild,
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { OnInit } from '@angular/core';
-import { IonSlides, ModalController } from '@ionic/angular';
-import { interval, Observable, Subscription, Timestamp } from 'rxjs';
+import { AlertController, IonSlides, ModalController } from '@ionic/angular';
+import { interval, Subscription } from 'rxjs';
 import { ModalPage } from './modal/modal.page';
 import { WeatherService } from 'src/services/weather.service';
-import { element } from 'protractor';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage implements OnInit, OnChanges, OnDestroy {
+export class HomePage implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('cards') cards: IonSlides;
   @ViewChild('activeCard') activeCard: IonSlides;
 
@@ -52,8 +52,16 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
   sunsetTimestamp: number;
   sunsetTime: string;
   cloudiness: number;
+  turnOnTime: any;
+  turnOffTime: any;
 
   nr: number;
+  timeDiffOn: number;
+  timeDiffOff: number;
+
+  currentMin: any;
+  turnOnMin: any;
+  turnOffMin: any;
 
   slideOptions = {
     slidesPerView: 'auto',
@@ -73,28 +81,24 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
       id: '0',
       name: 'LIGHTS',
       tag: 'L',
-      currentValue: 'off',
       path: 'assets/custom/lights-icon.svg',
     },
     {
       id: '1',
       name: 'WINDOWS',
       tag: 'W',
-      currentValue: 'open',
       path: 'assets/custom/windows-icon.svg',
     },
     {
       id: '2',
       name: 'BLINDS',
       tag: 'B',
-      currentValue: 'up',
       path: 'assets/custom/blinds-icon.svg',
     },
     {
       id: '3',
       name: 'AIR CONDITIONER',
       tag: 'AC',
-      currentValue: '20°C',
       path: 'assets/custom/temperature-icon.svg',
     },
   ];
@@ -105,12 +109,29 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
   constructor(
     private http: HttpClient,
     private weatherService: WeatherService,
-    public modalController: ModalController
+    public modalController: ModalController,
+    public alertController: AlertController,
+    private geolocation: Geolocation
   ) {}
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.innerWidth = window.innerWidth;
+  }
+
+  async presentAlert() {
+    const alert = await this.alertController.create({
+      cssClass: 'my-custom-class',
+      header: 'Philips Hue',
+      message:
+        'Neuspješno povezivanje. Molimo provjerite da ste spojeni na istu mrežu kao i Hue most.',
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+
+    // const { role } = await alert.onDidDismiss();
+    // console.log('onDidDismiss resolved with role', role);
   }
 
   async presentModal() {
@@ -125,23 +146,18 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
     modal.onDidDismiss().then((data) => {
       const formData = data.data;
       console.log(formData);
-      const turnOnTime = formData[4].slice(11, 16);
-      const turnOffTime = formData[6].slice(11, 16);
+      this.turnOnTime = formData[4].slice(11, 16);
+      this.turnOffTime = formData[6].slice(11, 16);
 
       // remote access not set
-      // CLOUDINESS TURN ON
       if (this.parameterToggle[0]) {
         localStorage.setItem('turnOnOvercast', formData[1].toString());
-      }
-
-      // SUNSET TURN ON
-      if (this.parameterToggle[0]) {
         localStorage.setItem('turnOnSunset', formData[2].toString());
+        // console.log(localStorage.getItem('turnOnSunset'));
       }
 
       // SCHEDULE TURN ON
       if (
-        this.parameterToggle[0] &&
         formData[4] !== '' &&
         formData[4] !== localStorage.getItem('turnOnAtVal')
       ) {
@@ -158,15 +174,25 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
               on: true,
             },
           },
-          localtime: 'W127/T' + turnOnTime + ':00',
+          localtime: 'W127/T' + this.turnOnTime + ':00',
         };
         JSON.stringify(payload);
-        this.lightChangeAuto(payload, 1);
+        if (this.parameterToggle[0]) {
+          this.lightChangeAuto(payload, 1);
+          const dateNow = new Date();
+
+          this.turnOnMin = Number(this.turnOnTime.slice(3, 5));
+          this.currentMin = dateNow.getMinutes();
+
+          this.timeDiffOn = 60 * 1000 * (this.turnOnMin - this.currentMin);
+          setTimeout(() => {
+            this.lightsRangeVal = 100;
+          }, this.timeDiffOn);
+        }
       }
 
       // SCHEDULE TURN OFF
       else if (
-        this.parameterToggle[0] &&
         formData[6] !== '' &&
         formData[6] !== localStorage.getItem('turnOffAtVal')
       ) {
@@ -183,27 +209,24 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
               on: false,
             },
           },
-          localtime: 'W127/T' + turnOffTime + ':00',
+          localtime: 'W127/T' + this.turnOffTime + ':00',
         };
         JSON.stringify(payload);
-        this.lightChangeAuto(payload, 2);
-        this.lightsRangeVal = 0;
+        if (this.parameterToggle[0]) {
+          this.lightChangeAuto(payload, 2);
+          const dateNow = new Date();
+
+          this.turnOffMin = Number(this.turnOffTime.slice(3, 5));
+          this.currentMin = dateNow.getMinutes();
+
+          this.timeDiffOff = 60 * 1000 * (this.turnOffMin - this.currentMin);
+          setTimeout(() => {
+            this.lightsRangeVal = 0;
+          }, this.timeDiffOff);
+        }
       }
-      console.log('posli', localStorage);
     });
     return await modal.present();
-  }
-
-  getPosition(): Observable<any> {
-    return new Observable((observer) => {
-      window.navigator.geolocation.getCurrentPosition(
-        (position) => {
-          observer.next(position);
-          observer.complete();
-        },
-        (error) => observer.error(error)
-      );
-    });
   }
 
   onMainToggle() {
@@ -293,7 +316,7 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
   }
 
   // LIGHTS SLIDER
-  sliderLightsChange(ev: any) {
+  sliderLightsChange() {
     // this.lightsRangeVal = ev.detail.value;
     this.hueLightsRangeVal = Math.floor(this.lightsRangeVal * 2.54);
 
@@ -365,6 +388,17 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
     this.http.put(`${this.hueApiUrl}/schedules/${num}`, payload).subscribe(
       (data) => {
         console.log(data);
+      },
+      (err) => {
+        console.log(err);
+      }
+    );
+  }
+
+  lightChangeWeather(payload) {
+    this.http.post(`${this.hueApiUrl}/schedules`, payload).subscribe(
+      (data) => {
+        console.log(data);
         console.log(payload);
       },
       (err) => {
@@ -393,53 +427,33 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
       },
       (err) => {
         console.log(err);
+        this.presentAlert();
       }
     );
-
-    this.getPosition().subscribe((pos) => {
-      this.latitude = pos.coords.latitude;
-      this.longitude = pos.coords.longitude;
-
-      this.getWeatherData();
-
-      this.weatherSubscription = interval(18000).subscribe(() => {
-        this.getWeatherData();
-
-        // lights auto mode
-        if (
-          this.parameterToggle[0] &&
-          localStorage.getItem('turnOnOvercast') === 'true' &&
-          this.cloudiness >= 90
-        ) {
-          this.lightChange('on', true);
-        } else if (
-          this.parameterToggle[0] &&
-          localStorage.getItem('turnOnSunset') === 'true' &&
-          this.sunsetTime !== localStorage.getItem('sunsetTime')
-        ) {
-          localStorage.setItem('sunsetTime', this.sunsetTime);
-          console.log('uspilo', this.sunsetTime);
-          const payload3 = {
-            name: 'Turn Sunset',
-            description: 'nez',
-            command: {
-              address: '/api/JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW/lights/1',
-              method: 'PUT',
-              body: {
-                on: true,
-              },
-            },
-            localtime: 'T:' + this.sunsetTime,
-          };
-          JSON.stringify(payload3);
-          console.log(payload3);
-          this.lightChangeAuto(payload3, 3);
-        }
-      });
-    });
   }
 
-  ngOnChanges() {}
+  ngAfterViewInit() {
+    const geolocationOptions = {
+      enableHighAccuracy: false,
+      timeout: 5000,
+    };
+    this.geolocation
+      .getCurrentPosition(geolocationOptions)
+      .then((pos) => {
+        this.latitude = pos.coords.latitude;
+        this.longitude = pos.coords.longitude;
+        console.log(pos.coords.latitude, pos.coords.longitude);
+
+        this.getWeatherData();
+
+        this.weatherSubscription = interval(600000).subscribe(() => {
+          this.getWeatherData();
+        });
+      })
+      .catch((error) => {
+        console.log('Error getting location', error);
+      });
+  }
 
   getWeatherData() {
     this.weatherService
@@ -448,9 +462,42 @@ export class HomePage implements OnInit, OnChanges, OnDestroy {
         this.cloudiness = Object.values(res)[4].clouds;
         this.sunsetTimestamp = Object.values(res)[4].sunset * 1000; //js in ms
 
+        console.log(Object.values(res));
         this.sunsetTime = new Date(this.sunsetTimestamp).toLocaleTimeString(
           'en-GB'
         );
+
+        if (
+          this.parameterToggle[0] &&
+          localStorage.getItem('turnOnOvercast') === 'true' &&
+          this.cloudiness >= 95
+        ) {
+          this.lightChange('on', true);
+        } else if (
+          this.parameterToggle[0] &&
+          localStorage.getItem('turnOnSunset') === 'true'
+          // && this.sunsetTime !== localStorage.getItem('sunsetTime')
+        ) {
+          localStorage.setItem('sunsetTime', this.sunsetTime);
+          console.log('uspilo', this.sunsetTime);
+          const payload = {
+            name: 'Turn On Sunset',
+            command: {
+              address:
+                '/api/JHKK2i9q85tqdFK8dKIA3RRl1yFAO6Ii2X2kLBlW/groups/0/action',
+              method: 'PUT',
+              body: {
+                on: true,
+              },
+            },
+            localtime: 'W127/T' + this.sunsetTime,
+          };
+          JSON.stringify(payload);
+          console.log(payload);
+          if (this.parameterToggle[0]) {
+            this.lightChangeWeather(payload);
+          }
+        }
       });
   }
 

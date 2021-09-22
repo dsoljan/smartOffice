@@ -44,7 +44,7 @@
           slot="start"
           [(ngModel)]="formData[2]">
         </ion-checkbox>
-        <ion-label class="list-label">Turn on lights at sunset</ion-label>
+        <ion-label class="list-label">Turn on lights daily at sunset</ion-label>
       </ion-item>
       <ion-item>
         <ion-checkbox
@@ -53,7 +53,7 @@
           [(ngModel)]="formData[3]">
         </ion-checkbox>
         <ion-label class="list-label">
-          Turn on lights at
+          Turn on lights daily at
           <ion-datetime
             [class.disable-time]="!formData[3]"
             displayFormat="HH:mm"
@@ -70,7 +70,7 @@
           slot="start">
         </ion-checkbox>
         <ion-label class="list-label">
-          Turn off lights at
+          Turn off lights daily at
           <ion-datetime
             [class.disable-time]="!formData[5]"
             displayFormat="HH:mm"
